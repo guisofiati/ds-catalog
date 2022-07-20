@@ -7,12 +7,15 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.guisofiati.dscatalog.dto.CategoryDTO;
 import com.github.guisofiati.dscatalog.entities.Category;
 import com.github.guisofiati.dscatalog.repositories.CategoryRepository;
+import com.github.guisofiati.dscatalog.services.exceptions.DatabaseException;
 import com.github.guisofiati.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @Service
@@ -67,6 +70,20 @@ public class CategoryService {
 		}
 		catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException("Id " + id + " not found.");
+		}
+	}
+	
+	// nao usa o transaction pois precisamos capturar uma exceçao do banco
+	
+	public void delete(Long id) {
+		try {
+			repository.deleteById(id);
+		}
+		catch (EmptyResultDataAccessException e) { // id que nao existe
+			throw new ResourceNotFoundException("Id " + id + " not found to delete.");
+		}
+		catch (DataIntegrityViolationException e) { // deletar uma categoria com produtos associadas a ela. problema de integriade referencial
+			throw new DatabaseException("Integrity violation");
 		}
 	}
 }
