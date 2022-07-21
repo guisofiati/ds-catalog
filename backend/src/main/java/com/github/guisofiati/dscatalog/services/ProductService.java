@@ -12,8 +12,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.guisofiati.dscatalog.dto.CategoryDTO;
 import com.github.guisofiati.dscatalog.dto.ProductDTO;
+import com.github.guisofiati.dscatalog.entities.Category;
 import com.github.guisofiati.dscatalog.entities.Product;
+import com.github.guisofiati.dscatalog.repositories.CategoryRepository;
 import com.github.guisofiati.dscatalog.repositories.ProductRepository;
 import com.github.guisofiati.dscatalog.services.exceptions.DatabaseException;
 import com.github.guisofiati.dscatalog.services.exceptions.ResourceNotFoundException;
@@ -23,6 +26,9 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository repository;
+	
+	@Autowired
+	private CategoryRepository categoryRepository;
 
 	@Transactional(readOnly = true) // transacao async, ou faz tudo ou n faz nada
 	public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
@@ -46,7 +52,7 @@ public class ProductService {
 	public ProductDTO insert(ProductDTO dto) {
 		//transformar dto em uma entidade para salvar no banco
 		Product entity = new Product();
-		//entity.setName(dto.getName());
+		copyDtoToEntity(dto, entity);
 		entity = repository.save(entity);
 		return new ProductDTO(entity);
 	}
@@ -61,7 +67,7 @@ public class ProductService {
 		// que ele vai acessar o banco
 		try {
 			Product entity = repository.getReferenceById(id);
-			//entity.setName(dto.getName());
+			copyDtoToEntity(dto, entity);
 			entity = repository.save(entity);
 			return new ProductDTO(entity);
 		}
@@ -71,7 +77,6 @@ public class ProductService {
 	}
 	
 	// nao usa o transaction pois precisamos capturar uma exceçao do banco
-	
 	public void delete(Long id) {
 		try {
 			repository.deleteById(id);
@@ -81,6 +86,21 @@ public class ProductService {
 		}
 		catch (DataIntegrityViolationException e) { // deletar uma categoria com produtos associadas a ela. problema de integriade referencial
 			throw new DatabaseException("Integrity violation");
+		}
+	}
+	
+	private void copyDtoToEntity(ProductDTO dto, Product entity) {
+		entity.setName(dto.getName());
+		entity.setDescription(dto.getDescription());
+		entity.setPrice(dto.getPrice());
+		entity.setImgUrl(dto.getImgUrl());
+		entity.setMoment(dto.getMoment());
+		
+		entity.getCategories().clear();
+		
+		for (CategoryDTO catDto : dto.getCategories()) {
+			Category cat = categoryRepository.getReferenceById(catDto.getId());
+			entity.getCategories().add(cat);
 		}
 	}
 }
