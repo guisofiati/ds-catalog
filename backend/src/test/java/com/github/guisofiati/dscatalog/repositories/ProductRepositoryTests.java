@@ -15,12 +15,15 @@ import com.github.guisofiati.dscatalog.tests.Factory;
 @DataJpaTest
 public class ProductRepositoryTests {
 	
+	// 3 operaçoes no repository: find by id, delete, save
+	
 	@Autowired
 	private ProductRepository repository;
 	
 	private long existingId;
 	private long nonExistingId;
 	private long countTotalProducts;
+	private Optional<Product> result;
 	
 	@BeforeEach // antes de cada teste
 	void setUp() throws Exception {
@@ -34,7 +37,7 @@ public class ProductRepositoryTests {
 				
 		repository.deleteById(existingId); // faz rollback no banco depois
 		
-		Optional<Product> result = repository.findById(existingId); 
+		result = repository.findById(existingId); 
 		Assertions.assertFalse(result.isPresent());
 	}
 	
@@ -56,5 +59,21 @@ public class ProductRepositoryTests {
 		
 		Assertions.assertNotNull(product.getId());
 		Assertions.assertEquals(product.getId(), countTotalProducts + 1);
+	}
+	
+	@Test
+	public void findByIdShouldReturnOptionalNotEmptyWhenIdExists() {
+		
+		result = repository.findById(existingId);
+		
+		Assertions.assertTrue(result.isPresent());
+	}
+	
+	@Test
+	public void findByIdShouldReturnOptionalEmptyWhenIdDoesNotExists() {
+		
+		result = repository.findById(nonExistingId);
+		
+		Assertions.assertTrue(result.isEmpty());
 	}
 }

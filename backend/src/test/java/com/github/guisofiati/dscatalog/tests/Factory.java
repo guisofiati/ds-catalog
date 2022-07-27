@@ -9,7 +9,7 @@ import com.github.guisofiati.dscatalog.entities.Product;
 public class Factory {
 	
 	public static Product createProduct() {
-		Product product =  new Product(1L, "Phone", "Ultimate Phone", 800.0, "https://img.com/img.png", Instant.parse("2022-03-12T03:00:00Z"));
+		Product product = new Product(1L, "Phone", "Ultimate Phone", 800.0, "https://img.com/img.png", Instant.parse("2022-03-12T03:00:00Z"));
 		product.getCategories().add(new Category(2L, "Electronics"));
 		return product;
 	}
