@@ -14,10 +14,13 @@ import org.mockito.Mockito;
 import org.springframework.dao.DataIntegrityViolationException;
 // import org.mockito.Mockito.doNothing -> Import estatico
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.github.guisofiati.dscatalog.dto.ProductDTO;
 import com.github.guisofiati.dscatalog.entities.Product;
 import com.github.guisofiati.dscatalog.repositories.ProductRepository;
 import com.github.guisofiati.dscatalog.services.exceptions.DatabaseException;
@@ -93,5 +96,17 @@ public class ProductServiceTests {
 		});
 		
 		Mockito.verify(repository).deleteById(dependentId);
+	}
+	
+	@Test
+	public void findAllShouldReturnDataPaged() {
+		
+		Pageable pageable = PageRequest.of(0, 10);
+		
+		Page<ProductDTO> result = service.findAllPaged(pageable);
+		
+		Assertions.assertNotNull(result);
+		
+		Mockito.verify(repository).findAll(pageable);
 	}
 }
