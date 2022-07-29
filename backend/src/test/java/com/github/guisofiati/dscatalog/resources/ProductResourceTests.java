@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.guisofiati.dscatalog.dto.ProductDTO;
 import com.github.guisofiati.dscatalog.factory.Factory;
 import com.github.guisofiati.dscatalog.services.ProductService;
+import com.github.guisofiati.dscatalog.services.exceptions.DatabaseException;
 import com.github.guisofiati.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @WebMvcTest(ProductResource.class)
@@ -45,11 +46,13 @@ public class ProductResourceTests {
 	private PageImpl<ProductDTO> page;
 	private long existingId;
 	private long nonExistingId;
+	private long dependentId;
 
 	@BeforeEach
 	void setUp() throws Exception {
 		existingId = 1L;
 		existingId = 2L;
+		dependentId = 3L;
 		productDTO = Factory.createProductDTO();
 		page = new PageImpl<>(List.of(productDTO)); // permite instanciar pagina
 		
@@ -60,6 +63,10 @@ public class ProductResourceTests {
 
 		Mockito.when(service.update(eq(existingId), any())).thenReturn(productDTO);
 		Mockito.when(service.update(eq(nonExistingId), any())).thenThrow(ResourceNotFoundException.class);
+		
+		Mockito.doNothing().when(service).delete(existingId);
+		Mockito.doThrow(ResourceNotFoundException.class).when(service).delete(nonExistingId);
+		Mockito.doThrow(DatabaseException.class).when(service).delete(dependentId);
 	}
 	
 	@Test
