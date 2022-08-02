@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,7 +30,8 @@ public class User implements Serializable {
 	private String password;
 	
 	//associação direcionada, o user conheçe os roles, mas os roles nao conhece os users
-	@ManyToMany
+	// vai vim pendurado com o user os roles dele (quando busca o user no banco)
+	@ManyToMany(fetch = FetchType.EAGER) 
 	@JoinTable(
 			name = "tb_user_role",
 			joinColumns = @JoinColumn(name = "user_id"),
