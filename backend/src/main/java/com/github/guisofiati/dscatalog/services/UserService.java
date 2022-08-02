@@ -9,20 +9,27 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mapping.PropertyReferenceException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.guisofiati.dscatalog.dto.RoleDTO;
 import com.github.guisofiati.dscatalog.dto.UserDTO;
+import com.github.guisofiati.dscatalog.dto.UserInsertDTO;
 import com.github.guisofiati.dscatalog.entities.Role;
 import com.github.guisofiati.dscatalog.entities.User;
 import com.github.guisofiati.dscatalog.repositories.RoleRepository;
 import com.github.guisofiati.dscatalog.repositories.UserRepository;
 import com.github.guisofiati.dscatalog.services.exceptions.DatabaseException;
+import com.github.guisofiati.dscatalog.services.exceptions.QueryParameterException;
 import com.github.guisofiati.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class UserService {
+	
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 
 	@Autowired
 	private UserRepository repository;
@@ -32,8 +39,13 @@ public class UserService {
 	
 	@Transactional(readOnly = true)
 	public Page<UserDTO> findAllPaged(Pageable pageable) {
-		Page<User> list = repository.findAll(pageable);
-		return list.map(x -> new UserDTO(x)); // vai vir com os roles
+		try {
+			Page<User> list = repository.findAll(pageable);
+			return list.map(x -> new UserDTO(x)); // vai vir com os roles	
+		}
+		catch (PropertyReferenceException e) {
+			throw new QueryParameterException("Parameter incorrect");
+		}
 	}
 	
 	@Transactional(readOnly = true)
@@ -44,9 +56,11 @@ public class UserService {
 	}
 
 	@Transactional
-	public UserDTO insert(UserDTO dto) {
+	public UserDTO insert(UserInsertDTO dto) {
 		User entity = new User();
 		copyDtoToEntity(dto, entity);
+		// transformando senha do usuario para uma hash 
+		entity.setPassword(passwordEncoder.encode(dto.getPassword()));
 		entity = repository.save(entity);
 		return new UserDTO(entity);
 	}

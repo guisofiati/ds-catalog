@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.github.guisofiati.dscatalog.services.exceptions.DatabaseException;
+import com.github.guisofiati.dscatalog.services.exceptions.QueryParameterException;
 import com.github.guisofiati.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @ControllerAdvice
@@ -37,6 +38,18 @@ public class ResourceExceptionHandler {
 		err.setError("Database exception");
 		err.setMessage(e.getMessage());
 		err.setPath(req.getRequestURI());
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(QueryParameterException.class) //toda vez que estourar essa exception, vai ser tratado por esse metodo
+	public ResponseEntity<StandardError> queryParamException(QueryParameterException e, HttpServletRequest req) {
+		StandardError err = new StandardError();
+		HttpStatus status = HttpStatus.NOT_FOUND;
+		err.setTimestamp(Instant.now());
+		err.setStatus(status.value());
+		err.setError("Query parameter not found");
+		err.setMessage(e.getMessage());
+		err.setPath(req.getRequestURI() + "/" + req.getQueryString());
 		return ResponseEntity.status(status).body(err);
 	}
 }
