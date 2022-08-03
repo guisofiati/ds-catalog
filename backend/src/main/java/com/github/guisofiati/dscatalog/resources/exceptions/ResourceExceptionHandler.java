@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -50,6 +51,18 @@ public class ResourceExceptionHandler {
 		err.setError("Query parameter not found");
 		err.setMessage(e.getMessage());
 		err.setPath(req.getRequestURI() + "/" + req.getQueryString());
+		return ResponseEntity.status(status).body(err);
+	}
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class) //toda vez que estourar essa exception, vai ser tratado por esse metodo
+	public ResponseEntity<StandardError> fieldsValidation(MethodArgumentNotValidException e, HttpServletRequest req) {
+		StandardError err = new StandardError();
+		HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY; //422 -> entidade nao foi possivel de ser processada
+		err.setTimestamp(Instant.now());
+		err.setStatus(status.value());
+		err.setError("Field validation exception");
+		err.setMessage(e.getMessage());
+		err.setPath(req.getRequestURI());
 		return ResponseEntity.status(status).body(err);
 	}
 }
