@@ -2,6 +2,8 @@ package com.github.guisofiati.dscatalog.resources;
 
 import java.net.URI;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +42,7 @@ public class ProductResource {
 	}
 	
 	@PostMapping
-	public ResponseEntity<ProductDTO> insert(@RequestBody ProductDTO dto) { // vai ser por json
+	public ResponseEntity<ProductDTO> insert(@Valid @RequestBody ProductDTO dto) { // vai ser por json
 		dto = service.insert(dto);
 		
 		// por boa pratica, um recurso criado retorna 201,
@@ -54,7 +56,7 @@ public class ProductResource {
 	}
 	
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody ProductDTO dto) {
+	public ResponseEntity<ProductDTO> update(@PathVariable Long id, @Valid @RequestBody ProductDTO dto) {
 		dto = service.update(id, dto);
 		return ResponseEntity.ok().body(dto);
 	}
