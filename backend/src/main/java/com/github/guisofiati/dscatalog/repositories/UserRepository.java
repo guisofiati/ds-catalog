@@ -8,4 +8,6 @@ import com.github.guisofiati.dscatalog.entities.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>{
 
+	// buscar user no banco por email
+	User findByEmail(String email);
 }

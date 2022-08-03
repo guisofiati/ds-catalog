@@ -1,5 +1,8 @@
 package com.github.guisofiati.dscatalog.dto;
 
+import com.github.guisofiati.dscatalog.services.validation.UserInsertValid;
+
+@UserInsertValid // verifica se o email inserido ja existe no banco
 public class UserInsertDTO extends UserDTO{
 	
 	private static final long serialVersionUID = 1L;
