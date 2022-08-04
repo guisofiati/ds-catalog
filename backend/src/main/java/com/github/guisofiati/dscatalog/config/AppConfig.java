@@ -1,5 +1,6 @@
 package com.github.guisofiati.dscatalog.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -8,6 +9,9 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 @Configuration
 public class AppConfig {
+	
+	@Value("${jwt.secret}") // ler valor da variavel no arquivo de configuraçoes
+	private String jwtSecret;
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
@@ -19,7 +23,7 @@ public class AppConfig {
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
 		JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
-		tokenConverter.setSigningKey("MY-JWT-SECRET"); // assinatura
+		tokenConverter.setSigningKey(jwtSecret); // assinatura
 		return tokenConverter;
 	}
 
