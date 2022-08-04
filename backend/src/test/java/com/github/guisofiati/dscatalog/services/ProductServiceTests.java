@@ -79,11 +79,11 @@ public class ProductServiceTests {
 		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product)); // traz o obj
 		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty()); // traz vazio
 
-		Mockito.when(repository.getReferenceById(existingId)).thenReturn(product);
-		Mockito.when(repository.getReferenceById(nonExistingId)).thenThrow(EntityNotFoundException.class);
+		Mockito.when(repository.getOne(existingId)).thenReturn(product);
+		Mockito.when(repository.getOne(nonExistingId)).thenThrow(EntityNotFoundException.class);
 		
-		Mockito.when(categoryRepository.getReferenceById(existingId)).thenReturn(category);
-		Mockito.when(categoryRepository.getReferenceById(nonExistingId)).thenThrow(EntityNotFoundException.class);
+		Mockito.when(categoryRepository.getOne(existingId)).thenReturn(category);
+		Mockito.when(categoryRepository.getOne(nonExistingId)).thenThrow(EntityNotFoundException.class);
 	}
 	
 	@Test
@@ -159,7 +159,7 @@ public class ProductServiceTests {
 		
 		Assertions.assertNotNull(dto);
 		
-		Mockito.verify(repository).getReferenceById(existingId);
+		Mockito.verify(repository).getOne(existingId);
 		Mockito.verify(repository, Mockito.times(1)).save(product);
 	}
 	
@@ -170,7 +170,7 @@ public class ProductServiceTests {
 			service.update(nonExistingId, dto);
 		});
 		
-		Mockito.verify(repository).getReferenceById(nonExistingId);
+		Mockito.verify(repository).getOne(nonExistingId);
 		Mockito.verify(repository, never()).save(product); // nunca foi chamado
 	}
 }

@@ -66,7 +66,7 @@ public class ProductService {
 		// instanciar o obj provisorio com o id e so quando mandar salvar
 		// que ele vai acessar o banco
 		try {
-			Product entity = repository.getReferenceById(id);
+			Product entity = repository.getOne(id);
 			copyDtoToEntity(dto, entity);
 			entity = repository.save(entity);
 			return new ProductDTO(entity);
@@ -99,7 +99,7 @@ public class ProductService {
 		entity.getCategories().clear();
 		
 		for (CategoryDTO catDto : dto.getCategories()) {
-			Category cat = categoryRepository.getReferenceById(catDto.getId());
+			Category cat = categoryRepository.getOne(catDto.getId());
 			entity.getCategories().add(cat);
 		}
 	}
