@@ -1,5 +1,7 @@
 package com.github.guisofiati.dscatalog.services;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityNotFoundException;
@@ -31,9 +33,10 @@ public class ProductService {
 	private CategoryRepository categoryRepository;
 
 	@Transactional(readOnly = true) // transacao async, ou faz tudo ou n faz nada
-	public Page<ProductDTO> findAllPaged(Pageable pageable) {
-		Page<Product> list = repository.findAll(pageable);
-		return list.map(product -> new ProductDTO(product)); // usando construtor de 1 arg. sem as categorias
+	public Page<ProductDTO> findAllPaged(Long categoryId, String name, Pageable pageable) {
+		List<Category> categories = (categoryId == 0) ? null : Arrays.asList(categoryRepository.getOne(categoryId));
+		Page<Product> page = repository.find(categories, name, pageable);
+		return page.map(product -> new ProductDTO(product)); // usando construtor de 1 arg. sem as categorias
 		 		 
 //		 List<ProductDTO> listDto = new ArrayList<>();
 //		 for (Product cat : list) {
