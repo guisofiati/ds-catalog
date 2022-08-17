@@ -36,7 +36,8 @@ public class ProductService {
 	public Page<ProductDTO> findAllPaged(Long categoryId, String name, Pageable pageable) {
 		List<Category> categories = (categoryId == 0) ? null : Arrays.asList(categoryRepository.getOne(categoryId));
 		Page<Product> page = repository.find(categories, name, pageable);
-		return page.map(product -> new ProductDTO(product)); // usando construtor de 1 arg. sem as categorias
+		repository.findProductsWithCategories(page.getContent()); // page para list
+		return page.map(product -> new ProductDTO(product, product.getCategories())); // usando construtor de 1 arg. sem as categorias
 		 		 
 //		 List<ProductDTO> listDto = new ArrayList<>();
 //		 for (Product cat : list) {
